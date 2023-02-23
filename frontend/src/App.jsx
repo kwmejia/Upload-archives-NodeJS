@@ -1,10 +1,38 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Swal from 'sweetalert2'
+import { ImageComp } from './components/ImageComp'
 import './App.css'
 
 function App() {
   const [file, setFile] = useState(0);
+  const [images, setImages] = useState([]);
+
+
+  useEffect(() => {
+    getImages();
+  }, [])
+
+  const getImages = async () => {
+
+    try {
+      const { data } = await axios.get(`http://localhost:4000/images`);
+      console.log(data.data)
+      setImages(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getImage = async (name) => {
+    try {
+      const { data } = await axios.get(`http://localhost:4000/public/${name}`);
+      console.log(data)
+      return ''
+    } catch (error) {
+      return '';
+    }
+  }
 
   const upload = async () => {
     try {
@@ -31,11 +59,16 @@ function App() {
           type="file"
           onChange={(e) => setFile(e.target.files[0])}
         />
+        <div className="mt-3">
+          <button className="btn btn-success" onClick={upload}>Enviar</button>
+        </div>
       </div>
 
-      <div>
-        <button className="btn btn-success" onClick={upload}>Enviar</button>
+      <div className="">
+        <h3>Imagenes subidas</h3>
+        {images.map(image => (<ImageComp name={image.nombre} key={image.id} />))}
       </div>
+
     </div>
   )
 }
